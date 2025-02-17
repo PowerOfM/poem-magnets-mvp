@@ -1,0 +1,55 @@
+#root {
+  max-width: 1280px;
+  height: 100vh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.reset-button {
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+#canvas {
+  width: 380px;
+  height: 380px;
+  border: 2px dashed var(--gray);
+  border-radius: var(--border-radius);
+}
+
+.word-bank {
+  height: 144px;
+  width: 380px;
+  padding: 10px;
+  background-color: rgb(223, 225, 252);
+  border-radius: var(--border-radius);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.word {
+  height: 34px;
+  border: 1px solid var(--gray);
+  padding: 5px 10px;
+  border-radius: var(--border-radius);
+  cursor: grab;
+  font-size: 15px;
+  font-family: "Space Mono", monospace;
+}
+
+.word:active {
+  cursor: grabbing;
+  background-color: var(--gray);
+  user-select: none;
+}
