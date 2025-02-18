@@ -2,6 +2,7 @@ import { generate } from "random-words";
 import { useRef, useState } from "react";
 import "./App.css";
 import { PoemRenderer } from "./PoemRenderer";
+
 const PREPOSITIONS = [
   "a",
   "and",
@@ -38,11 +39,11 @@ function shuffleArray(array: string[]) {
 
 function generateWords() {
   const words = [
-    ...generate(6),
-    // Add 3-5 prepositions
-    ...shuffleArray(PREPOSITIONS).slice(0, Math.floor(Math.random() * 3) + 3),
-    // Add 1-3 punctuation marks
-    ...shuffleArray(PUNCTUATION).slice(0, Math.floor(Math.random() * 3) + 1),
+    ...generate({ exactly: 6, minLength: 3, maxLength: 100 }),
+    // Add 2-3 prepositions
+    ...shuffleArray(PREPOSITIONS).slice(0, Math.floor(Math.random() * 3) + 2),
+    // Add 1-2 punctuation marks
+    ...shuffleArray(PUNCTUATION).slice(0, Math.floor(Math.random() * 2) + 1),
   ];
 
   return shuffleArray(words).map((word) => ({ word, x: 0, y: 0 }));
@@ -64,6 +65,7 @@ const Word = ({
   const offsetRef = useRef({ x: 0, y: 0 });
 
   const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    event.preventDefault();
     setIsDragging(true);
     const target = event.target as HTMLElement;
     offsetRef.current.x = event.touches[0].clientX - target.offsetLeft;
@@ -73,6 +75,7 @@ const Word = ({
 
   const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
     if (!isDragging) return;
+    event.preventDefault();
     const target = event.target as HTMLElement;
     const x = event.touches[0].clientX - offsetRef.current.x;
     const y = event.touches[0].clientY - offsetRef.current.y;
@@ -93,6 +96,7 @@ const Word = ({
   };
 
   const handleDragEnd = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
     if (isDragging) return;
     let x = 0;
     let y = 0;
@@ -105,8 +109,8 @@ const Word = ({
 
   return (
     <div
+      draggable
       className="word"
-      // draggable
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -143,12 +147,6 @@ export const App = () => {
     });
   };
 
-  const handleReset = () => {
-    if (window.confirm("Are you sure you want to reset?")) {
-      setWordSet(INITIAL_WORDS);
-    }
-  };
-
   const handleShare = () => {
     const divCanvas = document.getElementById("canvas") as HTMLDivElement;
     const offset = divCanvas.getBoundingClientRect();
@@ -161,11 +159,17 @@ export const App = () => {
     renderer.saveOrShare();
   };
 
+  const handleRefresh = () => {
+    if (confirm("Are you sure you want to clear the poem and get new words?")) {
+      setWordSet(generateWords());
+    }
+  };
+
   return (
     <>
       <div className="header">
         <h1>Magnet Poem</h1>
-        <button className="reset-button" onClick={handleReset}>
+        <button className="reset-button" onClick={handleRefresh}>
           🔄
         </button>
       </div>

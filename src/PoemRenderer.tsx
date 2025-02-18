@@ -75,21 +75,31 @@ export class PoemRenderer {
       }));
   }
 
-  public saveOrShare() {
-    if ("share" in navigator) {
-      navigator.share({
-        files: [
-          new File([this.canvas.toDataURL("image/png")], "magnet-poem.png", {
-            type: "image/png",
-          }),
-        ],
-      });
-    } else {
-      this.save();
-    }
+  public async saveOrShare() {
+    this.share().catch(() => this.download());
   }
 
-  public save() {
+  public async share() {
+    if (!("share" in navigator)) {
+      throw new Error("Share not supported");
+    }
+
+    const blob = await new Promise<Blob>((resolve, reject) => {
+      this.canvas.toBlob((blob) => {
+        if (!blob) {
+          reject(new Error("Could not create blob"));
+        } else {
+          resolve(blob);
+        }
+      });
+    });
+
+    navigator.share({
+      files: [new File([blob], "magnet-poem.png", { type: "image/png" })],
+    });
+  }
+
+  public download() {
     const image = this.canvas.toDataURL("image/png");
     const link = document.createElement("a");
     link.href = image;
